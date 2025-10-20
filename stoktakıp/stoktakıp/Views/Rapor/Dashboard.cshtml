@@ -1,0 +1,273 @@
+@model stoktakýp.Controllers.DashboardViewModel
+
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<div class="row mb-4">
+    <div class="col-12">
+        <h2><i class="fas fa-chart-line"></i> Dashboard - Genel Bakýþ</h2>
+    </div>
+</div>
+
+<!-- Ýstatistik Kartlarý -->
+<div class="row mb-4">
+    <div class="col-md-3 col-sm-6 mb-3">
+        <div class="card text-white bg-primary">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h3 class="mb-0">@Model.ToplamCihazSayisi</h3>
+                        <p class="mb-0">Toplam Cihaz Türü</p>
+                    </div>
+                    <div>
+                        <i class="fas fa-laptop fa-3x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3 col-sm-6 mb-3">
+        <div class="card text-white bg-success">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h3 class="mb-0">@Model.ToplamStokMiktari</h3>
+                        <p class="mb-0">Mevcut Stok</p>
+                    </div>
+                    <div>
+                        <i class="fas fa-warehouse fa-3x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3 col-sm-6 mb-3">
+        <div class="card text-white bg-warning">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h3 class="mb-0">@Model.KullanimdakiCihazSayisi</h3>
+                        <p class="mb-0">Kullanýmda</p>
+                    </div>
+                    <div>
+                        <i class="fas fa-user-tag fa-3x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3 col-sm-6 mb-3">
+        <div class="card text-white bg-danger">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h3 class="mb-0">@Model.IadeEdilmemisIslemSayisi</h3>
+                        <p class="mb-0">Ýade Bekleyen</p>
+                    </div>
+                    <div>
+                        <i class="fas fa-exclamation-triangle fa-3x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Hýzlý Eriþim Butonlarý -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-secondary text-white">
+                <h5 class="mb-0"><i class="fas fa-rocket"></i> Hýzlý Ýþlemler</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 col-sm-6 mb-2">
+                        <a asp-controller="Cihaz" asp-action="Create" class="btn btn-success w-100">
+                            <i class="fas fa-plus-circle"></i> Yeni Cihaz Ekle
+                        </a>
+                    </div>
+                    <div class="col-md-3 col-sm-6 mb-2">
+                        <a asp-controller="TeslimIslemleri" asp-action="Create" class="btn btn-primary w-100">
+                            <i class="fas fa-exchange-alt"></i> Teslim Ýþlemi
+                        </a>
+                    </div>
+                    <div class="col-md-3 col-sm-6 mb-2">
+                        <a asp-action="MevcutStokDurumu" class="btn btn-info w-100">
+                            <i class="fas fa-warehouse"></i> Stok Durumu
+                        </a>
+                    </div>
+                    <div class="col-md-3 col-sm-6 mb-2">
+                        <a asp-action="KisiyeGoreZimmetli" class="btn btn-warning w-100">
+                            <i class="fas fa-user-tag"></i> Zimmetli Cihazlar
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Son Ýþlemler ve Düþük Stoklu Cihazlar -->
+<div class="row">
+    <!-- Son Ýþlemler -->
+    <div class="col-md-8 mb-4">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="fas fa-history"></i> Son Ýþlemler</h5>
+            </div>
+            <div class="card-body">
+                @if (Model.SonIslemler.Any())
+                {
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Tarih</th>
+                                    <th>Cihaz</th>
+                                    <th>Ýþlem</th>
+                                    <th>Personel</th>
+                                    <th>Adet</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var islem in Model.SonIslemler)
+                                {
+                                    <tr>
+                                        <td><small>@islem.TeslimTarihi.ToString("dd.MM.yyyy")</small></td>
+                                        <td><strong>@islem.Cihaz.CihazAdi</strong></td>
+                                        <td>
+                                            @if (islem.IslemTipi == stoktakýp.Models.IslemTipi.StokGirisi)
+                                            {
+                                                <span class="badge bg-success">Stok Giriþi</span>
+                                            }
+                                            else if (islem.IslemTipi == stoktakýp.Models.IslemTipi.PersoneleTeslim)
+                                            {
+                                                <span class="badge bg-warning text-dark">Teslim</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-info">Ýade</span>
+                                            }
+                                        </td>
+                                        <td>@islem.TeslimAlan</td>
+                                        <td><span class="badge bg-secondary">@islem.Adet</span></td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="text-center mt-2">
+                        <a asp-controller="TeslimIslemleri" asp-action="Index" class="btn btn-sm btn-outline-info">
+                            Tümünü Gör <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                }
+                else
+                {
+                    <div class="alert alert-info mb-0">
+                        <i class="fas fa-info-circle"></i> Henüz iþlem bulunmamaktadýr.
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- Düþük Stoklu Cihazlar -->
+    <div class="col-md-4 mb-4">
+        <div class="card">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0"><i class="fas fa-exclamation-triangle"></i> Düþük Stok Uyarýsý</h5>
+            </div>
+            <div class="card-body">
+                @if (Model.DusukStokluCihazlar.Any())
+                {
+                    <div class="list-group">
+                        @foreach (var cihaz in Model.DusukStokluCihazlar)
+                        {
+                            <div class="list-group-item">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <strong>@cihaz.CihazAdi</strong><br />
+                                        <small class="text-muted">@cihaz.Marka @cihaz.Model</small>
+                                    </div>
+                                    <div>
+                                        @if (cihaz.MevcutStok == 0)
+                                        {
+                                            <span class="badge bg-danger">Tükendi</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-warning text-dark">@cihaz.MevcutStok</span>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                    <div class="text-center mt-2">
+                        <a asp-controller="Cihaz" asp-action="Index" class="btn btn-sm btn-outline-warning">
+                            Tümünü Gör <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                }
+                else
+                {
+                    <div class="alert alert-success mb-0">
+                        <i class="fas fa-check-circle"></i> Tüm cihazlar yeterli stokta.
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Rapor Linkleri -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-file-alt"></i> Raporlar</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4 mb-2">
+                        <a asp-action="MevcutStokDurumu" class="btn btn-outline-primary w-100 text-start">
+                            <i class="fas fa-warehouse"></i> Mevcut Stok Durumu Raporu
+                        </a>
+                    </div>
+                    <div class="col-md-4 mb-2">
+                        <a asp-action="TeslimGecmisi" class="btn btn-outline-primary w-100 text-start">
+                            <i class="fas fa-history"></i> Teslim Geçmiþi Raporu
+                        </a>
+                    </div>
+                    <div class="col-md-4 mb-2">
+                        <a asp-action="KisiyeGoreZimmetli" class="btn btn-outline-primary w-100 text-start">
+                            <i class="fas fa-user-tag"></i> Zimmetli Cihazlar Raporu
+                        </a>
+                    </div>
+                    <div class="col-md-4 mb-2">
+                        <a asp-action="CihazBazliHareket" class="btn btn-outline-primary w-100 text-start">
+                            <i class="fas fa-list-alt"></i> Cihaz Bazlý Hareket Raporu
+                        </a>
+                    </div>
+                    <div class="col-md-4 mb-2">
+                        <a asp-action="MarkaModelDagilim" class="btn btn-outline-primary w-100 text-start">
+                            <i class="fas fa-chart-pie"></i> Marka/Model Daðýlýmý
+                        </a>
+                    </div>
+                    <div class="col-md-4 mb-2">
+                        <a asp-action="IadeEdilmemis" class="btn btn-outline-primary w-100 text-start">
+                            <i class="fas fa-exclamation-triangle"></i> Ýade Edilmemiþ Cihazlar
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

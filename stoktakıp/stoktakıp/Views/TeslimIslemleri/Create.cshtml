@@ -1,0 +1,112 @@
+@model stoktakýp.Models.TeslimIslemi
+
+@{
+    ViewData["Title"] = "Yeni Teslim Ýþlemi";
+}
+
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h4><i class="fas fa-plus-circle"></i> Yeni Teslim Ýþlemi</h4>
+            </div>
+            <div class="card-body">
+                <form asp-action="Create" method="post">
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="CihazId" class="form-label"></label>
+                            <select asp-for="CihazId" class="form-select" asp-items="ViewBag.CihazId" id="cihazSelect">
+                                <option value="">-- Cihaz Seçin --</option>
+                            </select>
+                            <span asp-validation-for="CihazId" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="IslemTipi" class="form-label"></label>
+                            <select asp-for="IslemTipi" class="form-select" id="islemTipiSelect">
+                                <option value="">-- Ýþlem Tipi Seçin --</option>
+                                <option value="0">Stok Giriþi</option>
+                                <option value="1">Personele Teslim (Çýkýþ)</option>
+                                <option value="2">Ýade (Giriþ)</option>
+                            </select>
+                            <span asp-validation-for="IslemTipi" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="TeslimEden" class="form-label"></label>
+                            <input asp-for="TeslimEden" class="form-control" placeholder="Teslim eden kiþinin adý soyadý" />
+                            <span asp-validation-for="TeslimEden" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="TeslimAlan" class="form-label"></label>
+                            <input asp-for="TeslimAlan" class="form-control" placeholder="Teslim alan kiþinin adý soyadý" />
+                            <span asp-validation-for="TeslimAlan" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="TeslimTarihi" class="form-label"></label>
+                            <input asp-for="TeslimTarihi" class="form-control" type="date" />
+                            <span asp-validation-for="TeslimTarihi" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Adet" class="form-label"></label>
+                            <input asp-for="Adet" class="form-control" type="number" min="1" />
+                            <span asp-validation-for="Adet" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Aciklama" class="form-label"></label>
+                        <textarea asp-for="Aciklama" class="form-control" rows="3" placeholder="Ýsteðe baðlý açýklama..."></textarea>
+                        <span asp-validation-for="Aciklama" class="text-danger"></span>
+                    </div>
+
+                    <div class="alert alert-info">
+                        <strong><i class="fas fa-info-circle"></i> Bilgi:</strong>
+                        <ul class="mb-0">
+                            <li><strong>Stok Giriþi:</strong> Yeni cihaz alýmlarýnda kullanýlýr. Stok artar.</li>
+                            <li><strong>Personele Teslim:</strong> Cihazýn personele verilmesi. Stok azalýr.</li>
+                            <li><strong>Ýade:</strong> Personelden cihaz iadesi. Stok artar.</li>
+                        </ul>
+                    </div>
+
+                    <hr />
+
+                    <div class="d-flex justify-content-between">
+                        <a asp-action="Index" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Geri Dön
+                        </a>
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-save"></i> Kaydet
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        // Tarih input'unu bugünün tarihi ile doldur
+        document.addEventListener('DOMContentLoaded', function() {
+            var dateInput = document.querySelector('input[type="date"]');
+            if (dateInput && !dateInput.value) {
+                var today = new Date().toISOString().split('T')[0];
+                dateInput.value = today;
+            }
+        });
+    </script>
+}
+

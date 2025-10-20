@@ -1,0 +1,113 @@
+@model stoktakýp.Models.Cihaz
+
+@{
+    ViewData["Title"] = "Cihaz Detaylarý";
+}
+
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h4><i class="fas fa-info-circle"></i> Cihaz Detaylarý</h4>
+            </div>
+            <div class="card-body">
+                <dl class="row">
+                    <dt class="col-sm-3">Cihaz Adý:</dt>
+                    <dd class="col-sm-9"><strong>@Model.CihazAdi</strong></dd>
+
+                    <dt class="col-sm-3">Marka:</dt>
+                    <dd class="col-sm-9">@Model.Marka</dd>
+
+                    <dt class="col-sm-3">Model:</dt>
+                    <dd class="col-sm-9">@Model.Model</dd>
+
+                    <dt class="col-sm-3">Seri Numarasý:</dt>
+                    <dd class="col-sm-9"><code>@Model.SeriNumarasi</code></dd>
+
+                    <dt class="col-sm-3">Toplam Adet:</dt>
+                    <dd class="col-sm-9"><span class="badge bg-info">@Model.ToplamAdet</span></dd>
+
+                    <dt class="col-sm-3">Mevcut Stok:</dt>
+                    <dd class="col-sm-9"><span class="badge bg-success">@Model.MevcutStok</span></dd>
+
+                    <dt class="col-sm-3">Kullanýmda:</dt>
+                    <dd class="col-sm-9"><span class="badge bg-secondary">@(Model.ToplamAdet - Model.MevcutStok)</span></dd>
+
+                    <dt class="col-sm-3">Kayýt Tarihi:</dt>
+                    <dd class="col-sm-9">@Model.KayitTarihi.ToString("dd.MM.yyyy HH:mm")</dd>
+                </dl>
+
+                <hr />
+
+                <h5><i class="fas fa-history"></i> Teslim Ýþlemleri</h5>
+
+                @if (Model.TeslimIslemleri.Any())
+                {
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Tarih</th>
+                                    <th>Ýþlem Tipi</th>
+                                    <th>Teslim Eden</th>
+                                    <th>Teslim Alan</th>
+                                    <th>Adet</th>
+                                    <th>Ýade Tarihi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var islem in Model.TeslimIslemleri.OrderByDescending(t => t.TeslimTarihi))
+                                {
+                                    <tr>
+                                        <td>@islem.TeslimTarihi.ToString("dd.MM.yyyy")</td>
+                                        <td>
+                                            @if (islem.IslemTipi == stoktakýp.Models.IslemTipi.StokGirisi)
+                                            {
+                                                <span class="badge bg-success">Stok Giriþi</span>
+                                            }
+                                            else if (islem.IslemTipi == stoktakýp.Models.IslemTipi.PersoneleTeslim)
+                                            {
+                                                <span class="badge bg-warning text-dark">Personele Teslim</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-info">Ýade</span>
+                                            }
+                                        </td>
+                                        <td>@islem.TeslimEden</td>
+                                        <td>@islem.TeslimAlan</td>
+                                        <td>@islem.Adet</td>
+                                        <td>@(islem.IadeTarihi?.ToString("dd.MM.yyyy") ?? "-")</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i> Bu cihaza ait henüz teslim iþlemi bulunmamaktadýr.
+                    </div>
+                }
+
+                <hr />
+
+                <div class="d-flex justify-content-between">
+                    <a asp-action="Index" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Geri Dön
+                    </a>
+                    <div>
+                        <a asp-action="Edit" asp-route-id="@Model.CihazId" class="btn btn-warning">
+                            <i class="fas fa-edit"></i> Düzenle
+                        </a>
+                        <a asp-action="Delete" asp-route-id="@Model.CihazId" class="btn btn-danger">
+                            <i class="fas fa-trash"></i> Sil
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

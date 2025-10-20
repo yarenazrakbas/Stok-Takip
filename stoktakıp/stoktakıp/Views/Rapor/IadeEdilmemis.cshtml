@@ -1,0 +1,129 @@
+@model IEnumerable<stoktakýp.Models.TeslimIslemi>
+
+@{
+    ViewData["Title"] = "Ýade Edilmemiþ Cihazlar";
+}
+
+<div class="row mb-3">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center">
+            <h2><i class="fas fa-exclamation-triangle"></i> Ýade Edilmemiþ Cihazlar</h2>
+            <div>
+                <a asp-action="IadeEdilmemisExcel" class="btn btn-success">
+                    <i class="fas fa-file-excel"></i> Excel Ýndir
+                </a>
+                <button onclick="window.print()" class="btn btn-secondary">
+                    <i class="fas fa-print"></i> Yazdýr
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        @if (Model.Any())
+        {
+            <div class="table-responsive">
+                <table class="table table-hover table-striped">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Cihaz</th>
+                            <th>Marka/Model</th>
+                            <th>Teslim Alan</th>
+                            <th>Teslim Eden</th>
+                            <th>Teslim Tarihi</th>
+                            <th>Geçen Süre</th>
+                            <th>Adet</th>
+                            <th>Durum</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            var gecenGun = (DateTime.Now - item.TeslimTarihi).Days;
+                            <tr class="@(gecenGun > 365 ? "table-danger" : (gecenGun > 180 ? "table-warning" : ""))">
+                                <td><strong>@item.Cihaz.CihazAdi</strong></td>
+                                <td>@item.Cihaz.Marka @item.Cihaz.Model</td>
+                                <td><i class="fas fa-user"></i> @item.TeslimAlan</td>
+                                <td>@item.TeslimEden</td>
+                                <td>@item.TeslimTarihi.ToString("dd.MM.yyyy")</td>
+                                <td>
+                                    @if (gecenGun > 365)
+                                    {
+                                        <span class="badge bg-danger">@gecenGun gün <i class="fas fa-exclamation-triangle"></i></span>
+                                    }
+                                    else if (gecenGun > 180)
+                                    {
+                                        <span class="badge bg-warning text-dark">@gecenGun gün</span>
+                                    }
+                                    else if (gecenGun > 90)
+                                    {
+                                        <span class="badge bg-info">@gecenGun gün</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">@gecenGun gün</span>
+                                    }
+                                </td>
+                                <td><span class="badge bg-secondary">@item.Adet</span></td>
+                                <td>
+                                    @if (gecenGun > 365)
+                                    {
+                                        <span class="badge bg-danger">Kritik</span>
+                                    }
+                                    else if (gecenGun > 180)
+                                    {
+                                        <span class="badge bg-warning text-dark">Uzun Süreli</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-info">Normal</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="alert alert-secondary mt-3">
+                <div class="row">
+                    <div class="col-md-4">
+                        <strong>Toplam Ýade Bekleyen:</strong> @Model.Count() iþlem
+                    </div>
+                    <div class="col-md-4">
+                        <strong>Kritik (>365 gün):</strong> @Model.Count(t => (DateTime.Now - t.TeslimTarihi).Days > 365)
+                    </div>
+                    <div class="col-md-4">
+                        <strong>Toplam Cihaz Adedi:</strong> @Model.Sum(t => t.Adet)
+                    </div>
+                </div>
+            </div>
+
+            <div class="alert alert-info">
+                <strong><i class="fas fa-info-circle"></i> Bilgi:</strong>
+                <ul class="mb-0">
+                    <li><strong>Kritik:</strong> 365 günden fazla süre geçmiþ</li>
+                    <li><strong>Uzun Süreli:</strong> 180-365 gün arasý</li>
+                    <li><strong>Normal:</strong> 180 günden az</li>
+                </ul>
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-success text-center">
+                <i class="fas fa-check-circle"></i> Tüm cihazlar iade edilmiþtir. Bekleyen iþlem bulunmamaktadýr.
+            </div>
+        }
+    </div>
+</div>
+
+<style>
+    @@media print {
+        .btn { display: none; }
+        .navbar { display: none; }
+        .footer { display: none; }
+    }
+</style>
+

@@ -1,0 +1,49 @@
+@model stoktakýp.Models.Cihaz
+
+@{
+    ViewData["Title"] = "Cihaz Sil";
+}
+
+<div class="row">
+    <div class="col-md-6 offset-md-3">
+        <div class="card border-danger">
+            <div class="card-header bg-danger text-white">
+                <h4><i class="fas fa-exclamation-triangle"></i> Cihaz Sil</h4>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-warning">
+                    <strong>Uyarý!</strong> Bu cihazý silmek istediðinizden emin misiniz?
+                </div>
+
+                <dl class="row">
+                    <dt class="col-sm-4">Cihaz Adý:</dt>
+                    <dd class="col-sm-8"><strong>@Model.CihazAdi</strong></dd>
+
+                    <dt class="col-sm-4">Marka:</dt>
+                    <dd class="col-sm-8">@Model.Marka</dd>
+
+                    <dt class="col-sm-4">Model:</dt>
+                    <dd class="col-sm-8">@Model.Model</dd>
+
+                    <dt class="col-sm-4">Seri Numarasý:</dt>
+                    <dd class="col-sm-8"><code>@Model.SeriNumarasi</code></dd>
+                </dl>
+
+                <hr />
+
+                <form asp-action="Delete" method="post">
+                    <input type="hidden" asp-for="CihazId" />
+                    <div class="d-flex justify-content-between">
+                        <a asp-action="Index" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Ýptal
+                        </a>
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-trash"></i> Sil
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+

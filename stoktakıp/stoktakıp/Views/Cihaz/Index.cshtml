@@ -1,0 +1,101 @@
+@model IEnumerable<stoktakýp.Models.Cihaz>
+
+@{
+    ViewData["Title"] = "Cihaz Listesi";
+}
+
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2><i class="fas fa-laptop"></i> Cihaz Listesi</h2>
+            <a asp-action="Create" class="btn btn-success">
+                <i class="fas fa-plus"></i> Yeni Cihaz Ekle
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-3">
+    <div class="col-md-6">
+        <form asp-action="Index" method="get" class="d-flex">
+            <input type="text" name="searchString" class="form-control me-2" placeholder="Cihaz, marka, model veya seri no ara..." value="@ViewData["SearchString"]">
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-search"></i> Ara
+            </button>
+        </form>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover table-striped">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Cihaz Adý</th>
+                        <th>Marka</th>
+                        <th>Model</th>
+                        <th>Seri Numarasý</th>
+                        <th>Toplam Adet</th>
+                        <th>Mevcut Stok</th>
+                        <th>Kullanýmda</th>
+                        <th>Durum</th>
+                        <th>Ýþlemler</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        var kullanimda = item.ToplamAdet - item.MevcutStok;
+                        var stokDurum = item.MevcutStok < 5 ? "danger" : (item.MevcutStok < 10 ? "warning" : "success");
+
+                        <tr>
+                            <td><strong>@item.CihazAdi</strong></td>
+                            <td>@item.Marka</td>
+                            <td>@item.Model</td>
+                            <td><code>@item.SeriNumarasi</code></td>
+                            <td><span class="badge bg-info">@item.ToplamAdet</span></td>
+                            <td><span class="badge bg-@stokDurum">@item.MevcutStok</span></td>
+                            <td><span class="badge bg-secondary">@kullanimda</span></td>
+                            <td>
+                                @if (item.MevcutStok == 0)
+                                {
+                                    <span class="badge bg-danger">Tükendi</span>
+                                }
+                                else if (item.MevcutStok < 5)
+                                {
+                                    <span class="badge bg-warning text-dark">Kritik Seviye</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-success">Yeterli</span>
+                                }
+                            </td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <a asp-action="Details" asp-route-id="@item.CihazId" class="btn btn-sm btn-info" title="Detaylar">
+                                        <i class="fas fa-info-circle"></i>
+                                    </a>
+                                    <a asp-action="Edit" asp-route-id="@item.CihazId" class="btn btn-sm btn-warning" title="Düzenle">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a asp-action="Delete" asp-route-id="@item.CihazId" class="btn btn-sm btn-danger" title="Sil">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        @if (!Model.Any())
+        {
+            <div class="alert alert-info text-center">
+                <i class="fas fa-info-circle"></i> Henüz kayýtlý cihaz bulunmamaktadýr.
+            </div>
+        }
+    </div>
+</div>
+

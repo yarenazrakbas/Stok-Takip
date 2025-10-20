@@ -1,0 +1,127 @@
+@model IEnumerable<stoktakýp.Models.Cihaz>
+
+@{
+    ViewData["Title"] = "Mevcut Stok Durumu Raporu";
+}
+
+<div class="row mb-3">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center">
+            <h2><i class="fas fa-warehouse"></i> Mevcut Stok Durumu Raporu</h2>
+            <div>
+                <a asp-action="MevcutStokDurumuExcel" class="btn btn-success">
+                    <i class="fas fa-file-excel"></i> Excel Ýndir
+                </a>
+                <button onclick="window.print()" class="btn btn-secondary">
+                    <i class="fas fa-print"></i> Yazdýr
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover table-striped">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Cihaz Adý</th>
+                        <th>Marka</th>
+                        <th>Model</th>
+                        <th>Seri No</th>
+                        <th>Toplam Adet</th>
+                        <th>Mevcut Stok</th>
+                        <th>Kullanýmda</th>
+                        <th>Stok Oraný</th>
+                        <th>Durum</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        var toplamAdet = 0;
+                        var toplamStok = 0;
+                        var toplamKullanimda = 0;
+                    }
+                    @foreach (var item in Model)
+                    {
+                        var kullanimda = item.ToplamAdet - item.MevcutStok;
+                        var stokOrani = item.ToplamAdet > 0 ? (item.MevcutStok * 100.0 / item.ToplamAdet) : 0;
+                        toplamAdet += item.ToplamAdet;
+                        toplamStok += item.MevcutStok;
+                        toplamKullanimda += kullanimda;
+
+                        <tr>
+                            <td><strong>@item.CihazAdi</strong></td>
+                            <td>@item.Marka</td>
+                            <td>@item.Model</td>
+                            <td><code>@item.SeriNumarasi</code></td>
+                            <td><span class="badge bg-info">@item.ToplamAdet</span></td>
+                            <td><span class="badge bg-success">@item.MevcutStok</span></td>
+                            <td><span class="badge bg-warning text-dark">@kullanimda</span></td>
+                            <td>
+                                <div class="progress" style="height: 20px;">
+                                    <div class="progress-bar @(stokOrani < 25 ? "bg-danger" : (stokOrani < 50 ? "bg-warning" : "bg-success"))"
+                                         role="progressbar"
+                                         style="width: @stokOrani%"
+                                         aria-valuenow="@stokOrani"
+                                         aria-valuemin="0"
+                                         aria-valuemax="100">
+                                        @stokOrani.ToString("F0")%
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                @if (item.MevcutStok == 0)
+                                {
+                                    <span class="badge bg-danger">Tükendi</span>
+                                }
+                                else if (item.MevcutStok < 5)
+                                {
+                                    <span class="badge bg-warning text-dark">Kritik</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-success">Yeterli</span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+                <tfoot class="table-secondary">
+                    <tr>
+                        <th colspan="4" class="text-end">TOPLAM:</th>
+                        <th><span class="badge bg-info">@toplamAdet</span></th>
+                        <th><span class="badge bg-success">@toplamStok</span></th>
+                        <th><span class="badge bg-warning text-dark">@toplamKullanimda</span></th>
+                        <th colspan="2"></th>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+
+        @if (!Model.Any())
+        {
+            <div class="alert alert-info text-center">
+                <i class="fas fa-info-circle"></i> Henüz kayýtlý cihaz bulunmamaktadýr.
+            </div>
+        }
+    </div>
+</div>
+
+<style>
+    @@media print {
+        .btn {
+            display: none;
+        }
+
+        .navbar {
+            display: none;
+        }
+
+        .footer {
+            display: none;
+        }
+    }
+</style>
+

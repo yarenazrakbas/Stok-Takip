@@ -1,0 +1,54 @@
+@model stoktakýp.Models.TeslimIslemi
+
+@{
+    ViewData["Title"] = "Cihaz Ýade";
+}
+
+<div class="row">
+    <div class="col-md-6 offset-md-3">
+        <div class="card border-success">
+            <div class="card-header bg-success text-white">
+                <h4><i class="fas fa-undo"></i> Cihaz Ýade</h4>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    <strong>Bilgi:</strong> Bu cihazý iade etmek istediðinizden emin misiniz?
+                </div>
+
+                <dl class="row">
+                    <dt class="col-sm-5">Cihaz:</dt>
+                    <dd class="col-sm-7"><strong>@Model.Cihaz.CihazAdi</strong></dd>
+
+                    <dt class="col-sm-5">Teslim Alan:</dt>
+                    <dd class="col-sm-7">@Model.TeslimAlan</dd>
+
+                    <dt class="col-sm-5">Teslim Tarihi:</dt>
+                    <dd class="col-sm-7">@Model.TeslimTarihi.ToString("dd.MM.yyyy")</dd>
+
+                    <dt class="col-sm-5">Adet:</dt>
+                    <dd class="col-sm-7"><span class="badge bg-secondary">@Model.Adet</span></dd>
+
+                    <dt class="col-sm-5">Geçen Süre:</dt>
+                    <dd class="col-sm-7">
+                        <span class="badge bg-warning text-dark">@((DateTime.Now - Model.TeslimTarihi).Days) gün</span>
+                    </dd>
+                </dl>
+
+                <hr />
+
+                <form asp-action="IadeEt" method="post">
+                    <input type="hidden" asp-for="IslemId" />
+                    <div class="d-flex justify-content-between">
+                        <a asp-action="Index" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Ýptal
+                        </a>
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-check"></i> Ýade Et
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+

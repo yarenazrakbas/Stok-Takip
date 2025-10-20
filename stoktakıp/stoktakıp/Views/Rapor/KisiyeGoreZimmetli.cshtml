@@ -1,0 +1,132 @@
+@model IEnumerable<stoktakýp.Models.TeslimIslemi>
+
+@{
+    ViewData["Title"] = "Kiþiye Göre Zimmetli Cihazlar";
+}
+
+<div class="row mb-3">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center">
+            <h2><i class="fas fa-user-tag"></i> Kiþiye Göre Zimmetli Cihazlar</h2>
+            <div>
+                <a asp-action="KisiyeGoreZimmetliExcel" class="btn btn-success">
+                    <i class="fas fa-file-excel"></i> Excel Ýndir
+                </a>
+                <button onclick="window.print()" class="btn btn-secondary">
+                    <i class="fas fa-print"></i> Yazdýr
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card mb-3">
+    <div class="card-body">
+        <form asp-action="KisiyeGoreZimmetli" method="get" class="row g-3">
+            <div class="col-md-8">
+                <label class="form-label">Personel Ara:</label>
+                <input type="text" name="kisiAdi" class="form-control" placeholder="Personel adý..." value="@ViewData["KisiAdi"]">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">&nbsp;</label>
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="fas fa-search"></i> Ara
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        @if (Model.Any())
+        {
+            var gruplananIslemler = Model.GroupBy(t => t.TeslimAlan).OrderBy(g => g.Key);
+
+            @foreach (var grup in gruplananIslemler)
+            {
+                <div class="mb-4">
+                    <h5 class="bg-primary text-white p-2 rounded">
+                        <i class="fas fa-user"></i> @grup.Key
+                        <span class="badge bg-warning text-dark float-end">@grup.Sum(t => t.Adet) Adet Cihaz</span>
+                    </h5>
+
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Cihaz</th>
+                                    <th>Marka/Model</th>
+                                    <th>Seri No</th>
+                                    <th>Adet</th>
+                                    <th>Teslim Tarihi</th>
+                                    <th>Geçen Süre</th>
+                                    <th>Teslim Eden</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var islem in grup.OrderBy(t => t.TeslimTarihi))
+                                {
+                                    var gecenGun = (DateTime.Now - islem.TeslimTarihi).Days;
+                                    <tr>
+                                        <td><strong>@islem.Cihaz.CihazAdi</strong></td>
+                                        <td>@islem.Cihaz.Marka @islem.Cihaz.Model</td>
+                                        <td><code>@islem.Cihaz.SeriNumarasi</code></td>
+                                        <td><span class="badge bg-secondary">@islem.Adet</span></td>
+                                        <td>@islem.TeslimTarihi.ToString("dd.MM.yyyy")</td>
+                                        <td>
+                                            @if (gecenGun > 365)
+                                            {
+                                                <span class="badge bg-danger">@gecenGun gün</span>
+                                            }
+                                            else if (gecenGun > 180)
+                                            {
+                                                <span class="badge bg-warning text-dark">@gecenGun gün</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-info">@gecenGun gün</span>
+                                            }
+                                        </td>
+                                        <td>@islem.TeslimEden</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            }
+
+            <div class="alert alert-secondary">
+                <strong>Özet:</strong> Toplam @gruplananIslemler.Count() personelde @Model.Sum(t => t.Adet) adet cihaz bulunmaktadýr.
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-info text-center">
+                <i class="fas fa-info-circle"></i> Zimmetli cihaz bulunmamaktadýr.
+            </div>
+        }
+    </div>
+</div>
+
+<style>
+    @@media print {
+        .btn {
+            display: none;
+        }
+
+        .card:nth-child(2) {
+            display: none;
+        }
+
+        .navbar {
+            display: none;
+        }
+
+        .footer {
+            display: none;
+        }
+    }
+</style>
+

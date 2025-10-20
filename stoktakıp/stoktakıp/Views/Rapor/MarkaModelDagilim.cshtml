@@ -1,0 +1,127 @@
+@model IEnumerable<stoktakýp.Controllers.MarkaModelDagilimViewModel>
+
+@{
+    ViewData["Title"] = "Marka/Model Daðýlým Raporu";
+}
+
+<div class="row mb-3">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center">
+            <h2><i class="fas fa-chart-pie"></i> Marka/Model Daðýlým Raporu</h2>
+            <div>
+                <a asp-action="MarkaModelDagilimExcel" class="btn btn-success">
+                    <i class="fas fa-file-excel"></i> Excel Ýndir
+                </a>
+                <button onclick="window.print()" class="btn btn-secondary">
+                    <i class="fas fa-print"></i> Yazdýr
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        @if (Model.Any())
+        {
+            var markalar = Model.GroupBy(m => m.Marka);
+
+            @foreach (var marka in markalar)
+            {
+                var markaToplam = marka.Sum(m => m.ToplamAdet);
+                var markaStok = marka.Sum(m => m.MevcutStok);
+                var markaKullanimda = marka.Sum(m => m.KullanimdakiAdet);
+
+                <div class="mb-4">
+                    <h5 class="bg-primary text-white p-2 rounded">
+                        <i class="fas fa-tag"></i> @marka.Key
+                        <span class="float-end">
+                            <span class="badge bg-light text-dark">Toplam: @markaToplam</span>
+                            <span class="badge bg-success">Stok: @markaStok</span>
+                            <span class="badge bg-warning text-dark">Kullanýmda: @markaKullanimda</span>
+                        </span>
+                    </h5>
+
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Model</th>
+                                    <th>Cihaz Sayýsý</th>
+                                    <th>Toplam Adet</th>
+                                    <th>Mevcut Stok</th>
+                                    <th>Kullanýmda</th>
+                                    <th>Stok Oraný</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in marka)
+                                {
+                                    var stokOrani = item.ToplamAdet > 0 ? (item.MevcutStok * 100.0 / item.ToplamAdet) : 0;
+                                    <tr>
+                                        <td><strong>@item.Model</strong></td>
+                                        <td><span class="badge bg-secondary">@item.CihazSayisi</span></td>
+                                        <td><span class="badge bg-info">@item.ToplamAdet</span></td>
+                                        <td><span class="badge bg-success">@item.MevcutStok</span></td>
+                                        <td><span class="badge bg-warning text-dark">@item.KullanimdakiAdet</span></td>
+                                        <td>
+                                            <div class="progress" style="height: 20px;">
+                                                <div class="progress-bar @(stokOrani < 25 ? "bg-danger" : (stokOrani < 50 ? "bg-warning" : "bg-success"))"
+                                                     role="progressbar"
+                                                     style="width: @stokOrani%"
+                                                     aria-valuenow="@stokOrani"
+                                                     aria-valuemin="0"
+                                                     aria-valuemax="100">
+                                                    @stokOrani.ToString("F0")%
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            }
+
+            <div class="alert alert-secondary">
+                <div class="row">
+                    <div class="col-md-3">
+                        <strong>Toplam Marka:</strong> @markalar.Count()
+                    </div>
+                    <div class="col-md-3">
+                        <strong>Toplam Model:</strong> @Model.Count()
+                    </div>
+                    <div class="col-md-3">
+                        <strong>Toplam Cihaz:</strong> @Model.Sum(m => m.CihazSayisi)
+                    </div>
+                    <div class="col-md-3">
+                        <strong>Toplam Adet:</strong> @Model.Sum(m => m.ToplamAdet)
+                    </div>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-info text-center">
+                <i class="fas fa-info-circle"></i> Henüz kayýtlý cihaz bulunmamaktadýr.
+            </div>
+        }
+    </div>
+</div>
+
+<style>
+    @@media print {
+        .btn {
+            display: none;
+        }
+
+        .navbar {
+            display: none;
+        }
+
+        .footer {
+            display: none;
+        }
+    }
+</style>

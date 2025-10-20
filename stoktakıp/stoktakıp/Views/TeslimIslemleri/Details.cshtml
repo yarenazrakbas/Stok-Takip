@@ -1,0 +1,98 @@
+@model stoktakýp.Models.TeslimIslemi
+
+@{
+    ViewData["Title"] = "Teslim Ýþlemi Detaylarý";
+}
+
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h4><i class="fas fa-info-circle"></i> Teslim Ýþlemi Detaylarý</h4>
+            </div>
+            <div class="card-body">
+                <dl class="row">
+                    <dt class="col-sm-4">Cihaz:</dt>
+                    <dd class="col-sm-8">
+                        <strong>@Model.Cihaz.CihazAdi</strong><br />
+                        <small class="text-muted">@Model.Cihaz.Marka @Model.Cihaz.Model - @Model.Cihaz.SeriNumarasi</small>
+                    </dd>
+
+                    <dt class="col-sm-4">Ýþlem Tipi:</dt>
+                    <dd class="col-sm-8">
+                        @if (Model.IslemTipi == stoktakýp.Models.IslemTipi.StokGirisi)
+                        {
+                            <span class="badge bg-success">Stok Giriþi</span>
+                        }
+                        else if (Model.IslemTipi == stoktakýp.Models.IslemTipi.PersoneleTeslim)
+                        {
+                            <span class="badge bg-warning text-dark">Personele Teslim</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-info">Ýade</span>
+                        }
+                    </dd>
+
+                    <dt class="col-sm-4">Teslim Eden:</dt>
+                    <dd class="col-sm-8">@Model.TeslimEden</dd>
+
+                    <dt class="col-sm-4">Teslim Alan:</dt>
+                    <dd class="col-sm-8">@Model.TeslimAlan</dd>
+
+                    <dt class="col-sm-4">Adet:</dt>
+                    <dd class="col-sm-8"><span class="badge bg-secondary">@Model.Adet</span></dd>
+
+                    <dt class="col-sm-4">Teslim Tarihi:</dt>
+                    <dd class="col-sm-8">@Model.TeslimTarihi.ToString("dd.MM.yyyy")</dd>
+
+                    <dt class="col-sm-4">Ýade Tarihi:</dt>
+                    <dd class="col-sm-8">
+                        @if (Model.IadeTarihi.HasValue)
+                        {
+                            <span class="text-success">@Model.IadeTarihi.Value.ToString("dd.MM.yyyy")</span>
+                        }
+                        else
+                        {
+                            <span class="text-muted">Henüz iade edilmedi</span>
+                        }
+                    </dd>
+
+                    @if (Model.IslemTipi == stoktakýp.Models.IslemTipi.PersoneleTeslim && !Model.IadeTarihi.HasValue)
+                    {
+                        <dt class="col-sm-4">Geçen Süre:</dt>
+                        <dd class="col-sm-8">
+                            <span class="badge bg-warning text-dark">@((DateTime.Now - Model.TeslimTarihi).Days) gün</span>
+                        </dd>
+                    }
+
+                    @if (!string.IsNullOrEmpty(Model.Aciklama))
+                    {
+                        <dt class="col-sm-4">Açýklama:</dt>
+                        <dd class="col-sm-8">@Model.Aciklama</dd>
+                    }
+                </dl>
+
+                <hr />
+
+                <div class="d-flex justify-content-between">
+                    <a asp-action="Index" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Geri Dön
+                    </a>
+                    <div>
+                        @if (Model.IslemTipi == stoktakýp.Models.IslemTipi.PersoneleTeslim && !Model.IadeTarihi.HasValue)
+                        {
+                            <a asp-action="IadeEt" asp-route-id="@Model.IslemId" class="btn btn-success">
+                                <i class="fas fa-undo"></i> Ýade Et
+                            </a>
+                        }
+                        <a asp-action="Delete" asp-route-id="@Model.IslemId" class="btn btn-danger">
+                            <i class="fas fa-trash"></i> Sil
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
